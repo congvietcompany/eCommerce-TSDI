@@ -1,0 +1,34 @@
+
+<nav class="navbar navbar navbar-light bg-light text-left">
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-bars text-white"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent" style="width: 170px;">
+    <ul class="navbar-nav mr-auto">
+      {% for category in menu_categories %}
+          {% if not category.children.all %}
+                <li class="nav-item">
+                    <a class="nav-link px-2" href="{% url 'category_detail' category.slug %}"><i class="fas fa-arrow-circle-right"></i> {{category.name}}</a>
+                </li>
+          {% else %}
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="{% url 'category_detail' category.slug %}" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    &nbsp;&nbsp;<i class="fas fa-arrow-circle-right"></i> {{ category.name }}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% for subcategory in category.children.all %}
+                        <a class="dropdown-item" href="{% url 'category_detail' subcategory.slug %}">- {{ subcategory.name }}</a>
+                    {% endfor %}
+                </div>
+              </li>
+          {% endif %}
+
+      {% endfor categories %}
+    </ul>
+  </div>
+</nav>
+
+
+

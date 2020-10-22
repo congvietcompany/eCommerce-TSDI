@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="col-sm-12">
+    <h1>My Account</h1>
+    <a href="{% url 'logout' %}" class="btn btn-danger"> Log out</a>
+    <hr>
+    <h2>Acount information</h2>
+    <p><strong>Name :</strong> {{ request.user.get_full_name }}</p>
+    <p><strong>Email :</strong> {{ request.user.email }}</p>
+    <p><strong>Address :</strong> {{ request.user.userprofile.address }}</p>
+    <p><strong>Zipcode :</strong> {{ request.user.userprofile.zipcode }}</p>
+    <p><strong>Place :</strong> {{ request.user.userprofile.place }}</p>
+    <p><strong>Phone :</strong> {{ request.user.userprofile.phone }}</p>
+    <hr>
+    <h2>My orders</h2>
+    {% for order in request.user.orders.all %}
+        <article>
+            <p class="text-left">{{ order.created_at }}</p>
+            <p class="text-right"><strong>Status : </strong>{{ order.status }}</p>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Title</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in order.items.all %}
+                    <tr>
+                      <th scope="row">{{ item.id }}</th>
+                      <td>{{ item.product.title }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>$ {{ item.price }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td>Total</td><td>&nbsp;</td><td>{{ order.get_total_quantity }}</td><td>$ {{ order.paid_amount }}</td>
+                </tr>
+
+
+              </tbody>
+            </table>
+        </article>
+        {% empty %}
+        <p>You don't have any order yet..</p>
+    {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html'%}
+{% load static %}
+{% block title%} {{title}} {%endblock title%}
+
+{% block content%}
+
+<div class="container mt-5" id="productapp">
+    <div class="row">
+        <div class="col-sm-12 text-center mb-2"><h4>Featured Products</h4></div>
+        {% with featured_products as list_products %}
+            {% include 'parts/product_list.html' %}
+        {% endwith %}
+    </div>
+
+    <div class="row mt-5 mb-5">
+        <div class="col-sm-12 text-center "><h4>Featured Categories</h4></div>
+        {% for category in featured_categories %}
+            <h2 class="mt-5" style="border-bottom: 2px solid #ccc;font-size: 25px;margin-left: 20px;">{{ category.name }}</h2>
+            {% with category.products.all|slice:":4" as list_products %}
+                {% include 'parts/product_list.html' %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+</div>
+
+{%endblock content%}
+
+
+{% block scripts %}
+<script>
+    var productapp = new Vue({
+        el:'#productapp',
+        delimiters: ['[[',']]'],
+        store: store,
+        data(){
+            return {
+
+            }
+        },
+
+        methods:{
+            addToCart(product_id){
+                var data = {'product_id':product_id, 'update':false, 'quantity':1}
+                var url ='/api/add_to_cart/'
+                fetch(url,{
+                   method:'POST',
+                   headers:{
+                       'Content-Type':'application/json',
+                       'X-CSRFToken':'{{csrf_token}}'
+                   },
+                   credentials: 'same-origin',
+                   body:JSON.stringify(data)
+                })
+                .then((response)=>{
+                   store.commit('increment', 1);
+                })
+
+                .catch(function (error){
+                    console.log('Error 2')
+                    console.log(error)
+                })
+            }
+        }
+    });
+</script>
+{% endblock scripts %}

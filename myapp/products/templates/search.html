@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+    <div class="row" id="productapp">
+        <div class="col-sm-12 text-center"><h4>Search "{{ query }}"</h4></div>
+    </div>
+    <form method="get" action="{% url 'search' %}">
+        <div class="row">
+
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="query">Query</label>
+                    <input type="text" class="form-control" id="query" name="query" value="{{ query }}">
+                </div>
+                <div class="form-group">
+                    <label for="query">In stock</label>
+                    <input type="checkbox"  id="instock" name="instock" {% if instock %}checked="checked"{% endif %}>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="price_from">From</label>
+                    <input type="number" class="form-control"  id="price_from" name="price_from" value="{{ price_from }}">
+                </div>
+                <div class="form-group">
+                    <label for="price_to">To</label>
+                    <input type="number" class="form-control"  id="price_to" name="price_to" value="{{ price_to }}">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="query">Select Sorting criteria</label>
+                    <select name="sorting" id="sorting" class="form-control">
+                        <option value="-created_at" {% if sorting == '-created_at' %} selected {% endif %} >Newest first</option>
+                        <option value="price" {% if sorting == 'price' %} selected {% endif %} >Price low-high</option>
+                        <option value="-price" {% if sorting == '-price' %} selected {% endif %} >Price high-low</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+            <div class="row"><div class="col-sm-12"><button class="bnt btn-primary">Search</button></div></div>
+        </form>
+
+        {% with products as list_products %}
+            {% include 'parts/product_list.html' %}
+        {% endwith %}
+    </div>
+</div>
+
+{% endblock content%}
+
+{% block scripts %}
+<script>
+    var productapp = new Vue({
+        el:'#productapp',
+        delimiters: ['[[',']]'],
+        store: store,
+        data(){
+            return {
+
+            }
+        },
+
+        methods:{
+            addToCart(product_id){
+
+                var data = {'product_id':product_id, 'update':false, 'quantity':1}
+                var url ='/api/add_to_cart/'
+                fetch(url,{
+                   method:'POST',
+                   headers:{
+                       'Content-Type':'application/json',
+                       'X-CSRFToken':'{{csrf_token}}'
+                   },
+                   credentials: 'same-origin',
+                   body:JSON.stringify(data)
+                })
+                .then((response)=>{
+                   console.log(response)
+                   store.commit('increment', 1);
+                })
+
+                .catch(function (error){
+                    console.log('Error 2')
+                    console.log(error)
+                })
+            }
+        }
+    });
+</script>
+{% endblock scripts %}

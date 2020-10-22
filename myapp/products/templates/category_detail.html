@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-sm-3 text-left">
+            <ul>
+            {% for category in categories %}
+                <li class="text-center">
+                    <a href="{% url 'category_detail' category.slug %}">
+                        {% if category.image %}
+                        <img src="{{category.image.url}}" alt="" width="100%" type="float:left;">
+                        {% endif %}
+                        <h5>{{category.name}}</h5>
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="col-sm-9">
+            <div class="container">
+                <div class="row" id="productapp">
+                    <div class="col-sm-12">
+                        <nav aria-label="breadcrumb">
+                          <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                              {% if category.parent %}
+                                <li class="breadcrumb-item"><a href="{% url 'category_detail' category.parent.slug %}">{{ category.parent.name }}</a></li>
+                              {% endif %}
+                            <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
+                          </ol>
+                        </nav>
+                    </div>
+                    <div class="col-sm-12">
+
+                        <h1>{{category.name}}</h1>
+                        {% if category.children.all %}
+                            <div class="container">
+                                <div class="row">
+                                    {% for subcategory in  category.children.all %}
+                                        <div class="col-sm-3 text-center">
+                                            <img src="{{ subcategory.image.url }}" alt="" width="100%">
+                                            <h2>{{ subcategory.name }}</h2>
+                                            <a href="{% url 'category_detail' subcategory.slug %}">View products</a>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% else %}
+                            {% with products as list_products %}
+                                {% include 'parts/product_list.html' %}
+                            {% endwith %}
+                        {% endif %}
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content%}
+
+{% block scripts %}
+<script>
+    var productapp = new Vue({
+        el:'#productapp',
+        delimiters: ['[[',']]'],
+        store: store,
+        data(){
+            return {
+
+            }
+        },
+
+        methods:{
+            addToCart(product_id){
+
+                var data = {'product_id':product_id, 'update':false, 'quantity':1}
+                var url ='/api/add_to_cart/'
+                fetch(url,{
+                   method:'POST',
+                   headers:{
+                       'Content-Type':'application/json',
+                       'X-CSRFToken':'{{csrf_token}}'
+                   },
+                   credentials: 'same-origin',
+                   body:JSON.stringify(data)
+                })
+                .then((response)=>{
+                   console.log(response)
+                   store.commit('increment', 1);
+                })
+
+                .catch(function (error){
+                    console.log('Error 2')
+                    console.log(error)
+                })
+            }
+        }
+    });
+</script>
+{% endblock scripts %}

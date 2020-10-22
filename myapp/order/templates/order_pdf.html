@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Pdf</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <h1>Invoice #{{ order.id }}</h1>
+        <h2>Shipping address</h2>
+        <p>
+            {{ order.first_name }} {{ order.last_name }} <br>
+            {{ order.zipcode }} {{ order.place }}
+        </p>
+        <h2>Products</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">image</th>
+              <th scope="col">Title</th>
+              <th scope="col">Price</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for item in order.items.all %}
+            <tr>
+              <th scope="row">{{ order.id }}</th>
+              <td>
+                  {% if item.product.thumbnail.url %}
+                  <img src="http://127.0.0.1:8000{{ item.product.thumbnail.url }}" alt="">
+                  {% endif %} 
+              </td>  
+              <td>{{ item.product.title }}</td>
+              <td>{{ item.product.price }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.price }}</td>
+            </tr>
+          {% endfor %}
+          <tr><td colspan="5">Total</td><td >{{ order.paid_amount }}</td></tr>
+          </tbody>
+        </table>
+        <h2>TSDI Group</h2>
+        <p>Thank you for ordering from us !</p>
+    </div>
+
+</div>
+</body>
+</html>
